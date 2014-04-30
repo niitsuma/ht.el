@@ -234,6 +234,79 @@
            table)))
     (should (equal result nil))))
 
+
+(ert-deftest ht-test-swaped-items ()
+  (let ((test-table 	 (ht ("key1" "value1")  )	 ))
+    (should (equal (ht-swaped-items test-table) '(( "value1" "key1")))))    )
+
+(ert-deftest ht-test-swap ()
+  (let ((test-table 	 (ht ("key1" "value1")  )	 ))
+    (should (equal (ht-to-alist (ht-swap test-table)) '(( "value1" . "key1")))))    )
+
+(ert-deftest ht-test-valueds ()
+  (let ((test-table 
+	 (ht ("key1" "value1")  ("key2" "value2")  ("key3" "value2"))	 	 ))
+    (should (equal (ht-valueds test-table "value2")  '( "key3" "key2")))    ))
+
+(ert-deftest ht-test-valued ()
+  (let ((test-table 
+	 (ht ("key1" "value1")  ("key2" "value2") )	 	 ))
+    (should (equal (ht-valued test-table "value2")  "key2"))    ))
+
+(ert-deftest ht-test-gen-key ()
+  (let ((test-table (ht-create)))    
+    (should-not (ht-get test-table (ht-gen-key test-table )))    ))
+
+(ert-deftest ht-test-store-value ()
+  (let* (
+	 (key1 "key1")
+	 (value1 "value1")
+	 (test-table (ht (key1 value1)))
+	 (value2 "value2")
+	 (key2 (ht-store-value! test-table value2))
+	 )
+    (should (equal (ht-to-alist test-table) (list  (cons key2 value2)  (cons key1 value1) )))
+    (should (equal (ht-get test-table key2 ) value2))
+    (should (equal (ht-valued test-table value2 ) key2))    
+    (should (equal (ht-valued test-table value1 ) key1))    
+    (let (  (key3 (ht-store-value! test-table value1))  )
+      (should (equal key3 key1)) 
+      (should (equal (ht-to-alist test-table) (list  (cons key2 value2)  (cons key1 value1) )))
+      (let  ((key4 (ht-store-value! test-table value2)))
+      (should (equal key4 key4)) 
+      (should (equal (ht-to-alist test-table) (list  (cons key2 value2)  (cons key1 value1) )))
+    ))))
+
+(ert-deftest ht-test-gen-str-key ()
+  (let ((test-table (ht-create)))    
+    (should-not (ht-get test-table (ht-gen-str-key test-table "value1" )))    ))
+
+(ert-deftest ht-test-store-str-value ()
+  (let* (
+	 (key1 "key1")
+	 (value1 "value1")
+	 (test-table (ht (key1 value1)))
+	 (value2 "value2")
+	 (key2 (ht-store-str-value! test-table value2))
+	 )
+    (should (equal (length value2) (length key2)))
+    (should (equal (ht-to-alist test-table) (list  (cons key2 value2)  (cons key1 value1) )))
+    (should (equal (ht-get test-table key2 ) value2))
+    (should (equal (ht-valued test-table value2 ) key2))    
+    (should (equal (ht-valued test-table value1 ) key1))    
+    (let (  (key3 (ht-store-str-value! test-table value1))  )
+      (should (equal key3 key1)) 
+      (should (equal (ht-to-alist test-table) (list  (cons key2 value2)  (cons key1 value1) )))
+      (let  ((key4 (ht-store-str-value! test-table value2)))
+    	(should (equal key4 key4)) 
+    	(should (equal (ht-to-alist test-table) (list  (cons key2 value2)  (cons key1 value1) )))
+    	)
+      )
+    ))
+
+
+ 
+
 (defun ht-run-tests ()
   (interactive)
   (ert-run-tests-interactively "ht-test-"))

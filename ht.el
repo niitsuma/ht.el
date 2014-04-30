@@ -276,5 +276,66 @@ FUNCTION is called with two arguments, KEY and VALUE."
          (throw 'break (list key value))))
      table)))
 
+(defun ht-swaped-items (table)
+  "Return a list of two-element lists '(value key) from TABLE."
+  (ht-amap (list value key) table))
+
+(defun ht-swap (table)
+  "Retuen table swaped key value"
+  (let ((h (ht-create)))
+    (ht-amap (ht-set! h value key) table)
+    h))
+
+
+(defun ht-valueds (table valued)
+  "Retuen keys which has value"
+  (let (results)
+    (maphash
+     (lambda (key value)
+       (when (equal value valued)
+	 (push key results)))
+       table)
+    results))
+
+(defun ht-valued (table valued)
+  "Retuen key which has value"
+  (car (ht-valueds table valued)))
+
+(defun ht-gen-key (table)
+  "generate identilcal key"
+  (let ((key (random)))
+    (if (ht-get table key)
+	(ht-gen-key (table))
+      key)))
+
+(defun ht-store-value! (table value)
+  "store value with identical new key. and return new identical key"
+  (let ((key (ht-valued table value)))
+    (if key key
+      (let ((key-new (ht-gen-key table)))
+	(ht-set! table key-new value)
+	key-new))))
+
+
+(defun ht-gen-str-key (table base-str)
+  "genrereta new identilcal key str which has same str length to base-str"
+  (let* ((n (length base-str))
+	 (key 
+	  (substring 
+	   (format (concat "%0" (format "%d" n) "d") (random))
+	   (- n) )))
+    (if (ht-get table key)
+	(ht-gen-str-key table base-str))
+      key))
+
+(defun ht-store-str-value! (table value)
+  "store str value with identical key str with same str length.  and return new identical key"
+  (let ((key (ht-valued table value)))
+    (if key key
+      (let ((key-new (ht-gen-str-key table value)))
+	(ht-set! table key-new value)
+	key-new))))
+
+
 (provide 'ht)
 ;;; ht.el ends here
